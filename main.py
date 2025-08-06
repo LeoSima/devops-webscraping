@@ -7,6 +7,7 @@ app = FastAPI()
 async def root():
     return {"message": "Hello, world!"}
 
-@app.get("/HealthCheck")
-async def healthCheck():
+
+@app.get("/healthcheck")
+async def healthcheck():
     return {"message": "devops-webscraping no ar"}
