@@ -4,7 +4,7 @@ import random
 app = FastAPI()
 
 
-@app.get("/HealthCheck")
+@app.get("/healthcheck")
 async def healthcheck():
     return {"message": "devops-webscraping no ar"}
 
