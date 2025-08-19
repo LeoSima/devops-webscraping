@@ -7,6 +7,10 @@ on:
 jobs:
   test-and-lint:
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: read
+
     steps:
       - name: 1. Check out repository code
         uses: actions/checkout@v4
