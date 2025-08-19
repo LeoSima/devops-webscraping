@@ -23,7 +23,7 @@ async def init_webscraping(web_scraping_config: WebScrapingConfig):
     )
 
     if not vagas:
-        return {"message": "Nenhuma vaga encontrada para o filtro fornecido.", "data": []}
+        return {"message": "Nenhuma vaga encontrada para o filtro fornecido", "data": []}
 
     return {
         "message": f"{len(vagas)} vaga(s) encontrada(s)",
