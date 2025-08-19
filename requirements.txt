@@ -1,7 +1,9 @@
-fastapi~=0.116.1
-uvicorn[standard]
-requests~=2.32.5
 beautifulsoup4~=4.13.4
+fastapi~=0.116.1
+httpx
 lxml
-
 pydantic~=2.11.7
+pytest
+pytest-mock
+requests~=2.32.5
+uvicorn[standard]
