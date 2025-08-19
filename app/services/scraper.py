@@ -1,42 +1,8 @@
-import requests
-
-from bs4 import BeautifulSoup
-from fastapi import FastAPI
-from pydantic import BaseModel
 from typing import List, Dict, Optional
+import requests
+from bs4 import BeautifulSoup
+from fastapi import HTTPException
 
-
-app = FastAPI(
-    title="DevOps WebScraping API",
-    description="API simples desenvolvida para estudar e demonstrar conceitos de DevOps e web scraping",
-    version="0.1.0"
-)
-
-class WebScrapingConfig(BaseModel):
-    filtro: str
-    limite: int
-    ordenacao: str
-
-@app.get("/HealthCheck", tags=["Status"])
-async def health_check():
-    """Endpoint para verificar se a API está no ar"""
-    return {"message": "devops-webscraping no ar"}
-
-@app.post("/WebScraping", tags=["Scraping"])
-async def init_webscraping(web_scraping_config: WebScrapingConfig):
-    """Faz o processo de web scraping utilizando os filtros fornecidos"""
-    vagas = buscar_vagas(
-        filtro=web_scraping_config.filtro,
-        limite=web_scraping_config.limite
-    )
-
-    if not vagas:
-        return {"message": "Nenhuma vaga encontrada no filtro fornecido", "data": []}
-
-    return {
-        "message": f"{len(vagas)} vaga(s) encontrada(s)",
-        "data": vagas
-    }
 
 def buscar_vagas(filtro: str, limite: int) -> List[Dict[str, Optional[str]]]:
     """
@@ -49,7 +15,8 @@ def buscar_vagas(filtro: str, limite: int) -> List[Dict[str, Optional[str]]]:
     """
     url = f"https://www.vagas.com.br/vagas-de-{filtro.replace(' ', '-')}"
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/58.0.3029.110 Safari/537.3'
     }
 
     try:
@@ -78,7 +45,7 @@ def buscar_vagas(filtro: str, limite: int) -> List[Dict[str, Optional[str]]]:
             local = local_tag.get_text(strip=True) if local_tag else None
 
             link_tag = titulo_tag.find("a") if titulo_tag else None
-            link = f"https://www.vagas.com.br{link_tag["href"]}" if link_tag else None
+            link = f"https://www.vagas.com.br{link_tag['href']}" if link_tag else None
 
             lista_de_vagas.append({
                 "titulo": titulo,
@@ -88,10 +55,8 @@ def buscar_vagas(filtro: str, limite: int) -> List[Dict[str, Optional[str]]]:
                 "link": link
             })
 
-        return lista_de_vagas;
+        return lista_de_vagas
     except requests.exceptions.RequestException as ex:
-        print(f"Erro ao fazer a requisição HTTP: {ex}")
-        return []
+        raise HTTPException(status_code=503, detail=f"Erro na comunicação com o site de vagas: {ex}")
     except Exception as ex:
-        print(f"Erro inesperado durante o scraping: {ex}")
-        return []
+        raise HTTPException(status_code=500, detail=f"Erro inesperado durante o scraping: {ex}")
