@@ -47,6 +47,12 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: 5. Set Repository Name to Lowercase
+        id: repo
+        run: |
+          REPO_NAME=$(echo "${GITHUB_REPOSITORY##*/}" | tr '[:upper:]' '[:lower:]')
+          echo "repo_name=$REPO_NAME" >> "$GITHUB_OUTPUT"
+
       - name: 5. Build and Push
         uses: docker/build-push-action@v6
         with:
