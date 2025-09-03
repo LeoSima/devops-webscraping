@@ -70,12 +70,13 @@ jobs:
     if: always()
     steps:
       - name: Send notification to Discord
-        uses: Ilshidur/action-discord@master
+        uses: tsickert/discord-webhook@v5
         with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          message: >
-            *Continuous Delivery pipeline finalizada!*  
-            Status: `${{ job.status }}`  
-            Commit: `${{ github.sha }}`  
-            Branch: `${{ github.ref_name }}`  
-            Autor: `${{ github.actor }}`
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: "CD Pipeline finalizada"
+          embed-description: |
+            **Status:** ${{ job.status }}
+            **Branch:** ${{ github.ref_name }}
+            **Autor:** ${{ github.actor }}
+            **Commit:** ${{ github.sha }}
+          embed-color: ${{ job.status == 'success' && '5814783' || '16711680' }}

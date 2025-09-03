@@ -72,20 +72,14 @@ jobs:
       - docker
     if: always()
     steps:
-      - name: Testar se secret existe (sem printar valor!)
-        run: |
-          if [ -z "${{ secrets.DISCORD_WEBHOOK }}" ]; then
-            echo "Webhook não encontrado!"
-            exit 1
-          else
-            echo "Webhook encontrado!"
-          fi
       - name: Send notification to Discord
-        uses: Ilshidur/action-discord@master
+        uses: tsickert/discord-webhook@v5
         with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          message: >
-            CI Pipeline status: ${{ job.status }}  
-            Commit: ${{ github.sha }}  
-            Branch: ${{ github.ref_name }}  
-            By: ${{ github.actor }}
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: "CI Pipeline finalizada"
+          embed-description: |
+            **Status:** ${{ job.status }}
+            **Branch:** ${{ github.ref_name }}
+            **Autor:** ${{ github.actor }}
+            **Commit:** ${{ github.sha }}
+          embed-color: ${{ job.status == 'success' && '5814783' || '16711680' }}
