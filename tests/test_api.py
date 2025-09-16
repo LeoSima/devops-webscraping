@@ -22,7 +22,12 @@ def test_post_webscraping_sucesso(mocker):
     # Arrange
     payload = {"filtro": "python", "limite": 2}
     vagas_mock = [
-        {"titulo": "Vaga Falsa 1", "empresa": "Empresa Mock", "local": "Nuvem", "link": "http://link.mock"}
+        {
+            "titulo": "Vaga Falsa 1",
+            "empresa": "Empresa Mock",
+            "local": "Nuvem",
+            "link": "http://link.mock"
+        }
     ]
 
     mocker.patch('app.api.scraping.buscar_vagas', return_value=vagas_mock)

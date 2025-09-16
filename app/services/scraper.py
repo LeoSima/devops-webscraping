@@ -28,35 +28,47 @@ def buscar_vagas(filtro: str, limite: int) -> List[Dict[str, Optional[str]]]:
 
         lista_de_vagas = []
         for vaga in vagas_html[:limite]:
-            titulo_tag = vaga.find("h2", class_="cargo")
-            titulo = titulo_tag.get_text(strip=True) if titulo_tag else None
-
-            senioridade_tag = vaga.find("span", class_="nivelVaga")
-            senioridade = senioridade_tag.get_text(strip=True) if senioridade_tag else None
-
-            empresa_tag = vaga.find("span", class_="emprVaga")
-            empresa = empresa_tag.get_text(strip=True) if empresa_tag else None
-
-            # Os dois seletores podem conter vaga, pensar numa maneira de conciliá-los no scraping
-            # local_tag = vaga.find("div", class_="vaga-local")
-            # local = local_tag.get_text(strip=True) if local_tag else None
-
-            local_tag = vaga.find("span", class_="vaga-local")
-            local = local_tag.get_text(strip=True) if local_tag else None
-
-            link_tag = titulo_tag.find("a") if titulo_tag else None
-            link = f"https://www.vagas.com.br{link_tag['href']}" if link_tag else None
-
-            lista_de_vagas.append({
-                "titulo": titulo,
-                "senioridade": senioridade,
-                "empresa": empresa,
-                "local": local,
-                "link": link
-            })
+            lista_de_vagas.append(
+                montar_dados_vaga(vaga)
+            )
 
         return lista_de_vagas
     except requests.exceptions.RequestException as ex:
-        raise HTTPException(status_code=503, detail=f"Erro na comunicação com o site de vagas: {ex}")
+        raise HTTPException(
+            status_code=503,
+            detail=f"Erro na comunicação com o site de vagas: {ex}"
+        ) from ex
     except Exception as ex:
-        raise HTTPException(status_code=500, detail=f"Erro inesperado durante o scraping: {ex}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro inesperado durante o scraping: {ex}"
+        ) from ex
+
+
+def montar_dados_vaga(vaga):
+    titulo_tag = vaga.find("h2", class_="cargo")
+    titulo = titulo_tag.get_text(strip=True) if titulo_tag else None
+
+    senioridade_tag = vaga.find("span", class_="nivelVaga")
+    senioridade = senioridade_tag.get_text(strip=True) if senioridade_tag else None
+
+    empresa_tag = vaga.find("span", class_="emprVaga")
+    empresa = empresa_tag.get_text(strip=True) if empresa_tag else None
+
+    # Os dois seletores podem conter vaga, pensar numa maneira de conciliá-los no scraping
+    # local_tag = vaga.find("div", class_="vaga-local")
+    # local = local_tag.get_text(strip=True) if local_tag else None
+
+    local_tag = vaga.find("span", class_="vaga-local")
+    local = local_tag.get_text(strip=True) if local_tag else None
+
+    link_tag = titulo_tag.find("a") if titulo_tag else None
+    link = f"https://www.vagas.com.br{link_tag['href']}" if link_tag else None
+
+    return {
+        "titulo": titulo,
+        "senioridade": senioridade,
+        "empresa": empresa,
+        "local": local,
+        "link": link
+    }
